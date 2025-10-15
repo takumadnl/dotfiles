@@ -1,0 +1,9 @@
+export GOENV_DISABLE_GOPATH=1
+# export PYENV_ROOT="${HOME}/.anyenv/envs/pyenv"
+# export PATH="${PYENV_ROOT}/bin:${PATH}"
+# which pyenv  > /dev/null && eval "$(pyenv  init - --no-rehash)"
+which rbenv  > /dev/null && eval "$(rbenv  init - --no-rehash)"
+which anyenv > /dev/null && eval "$(anyenv init - --no-rehash)"
+# which fnm    > /dev/null && eval "$(fnm env --use-on-cd --shell zsh)"
+which mise   > /dev/null && eval "$(mise activate zsh)"
+

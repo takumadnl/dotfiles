@@ -1,0 +1,53 @@
+###########################################################
+# 補完
+
+## 高速な補完
+## タブ補完を実行するとき、タブを一回押すと入力している単語が部分的に補完されます。
+## 部分補完ができない場合、タブを二回押すと全ての補完候補が表示されます。
+
+### タブを一回押した時に二回押したときと同じ補完を実行する
+set show-all-if-unmodified on
+
+### 部分補完を実行して補完候補を全て表示
+# set show-all-if-ambiguous on
+
+
+## 大文字小文字を無視して補完
+set completion-ignore-case On
+
+###########################################################
+# Use Vi, not Emacs, style editing
+set editing-mode vi
+
+set show-mode-in-prompt on
+set vi-ins-mode-string "\1\e[6 q\2"
+set vi-cmd-mode-string "\1\e[2 q\2"
+
+set enable-bracketed-paste off
+
+############################################################
+set keymap vi-command
+
+############################################################
+# Keymaps for when we're in insert (i.e., typing stuff in) mode
+set keymap vi-insert
+
+"jj": vi-movement-mode
+
+# "\e[A":history-search-backward  # arrow up
+# "\e[B":history-search-forward  # arrow down
+"\C-p": history-search-backward
+"\C-n": history-search-forward
+
+"\C-a": beginning-of-line
+"\C-e": end-of-line
+
+"\C-l": clear-screen
+
+"\C-k": kill-line
+"\C-u": unix-line-discard
+# "\C-w": unix-word-rubout
+"\C-w": backward-kill-word
+"\C-h": kill-word
+"\C-_": insert-last-argument
+

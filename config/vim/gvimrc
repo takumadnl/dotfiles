@@ -1,0 +1,44 @@
+set lines=50
+set columns=140
+set showtabline=1 " タブバーを必要に応じて表示
+set guioptions-=T " ツールバーを非表示
+set guioptions-=r " スクロールバーを非表示
+set guioptions-=R " スクロールバーを非表示
+set guioptions-=l " スクロールバーを非表示
+set guioptions-=L " スクロールバーを非表示
+set transparency=5 " 透過率
+set termguicolors
+set background=dark
+" set cmdheight=1
+set t_Co=256
+" set term=xterm
+
+if has('gui_macvim')
+  let g:macvim_skip_colorscheme = 1
+  let g:no_gvimrc_example = 1
+endif
+
+" inoremap <ESC> <ESC>:set iminsert=0<CR>
+
+" set guifont=Migu\ 1M:h16
+" set guifont=Ricty\ Diminished:h16
+" set guifont=Ricty:h15
+set guifont=UDEV\ Gothic\ NF:h15
+set linespace=2
+" set linespace=0
+
+augroup TranparentBGGUI
+  autocmd!
+  autocmd ColorScheme * highlight EndOfBuffer guifg=bg
+augroup END
+
+" colorscheme molokai
+" colorscheme wombat
+let g:gruvbox_italic = 1
+colorscheme gruvbox
+
+let g:lightline.colorscheme = 'gruvbox'
+
+" Disable all blinking:
+set guicursor+=a:blinkon0
+

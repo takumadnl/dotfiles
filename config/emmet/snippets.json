@@ -1,0 +1,17 @@
+{
+  "variables": {
+    "lang": "ja",
+    "charset": "UTF-8"
+  },
+  "html": {
+    "snippets": {
+      "img": "img[loading=lazy src alt]/",
+      "script:d": "script[src=${1} defer='']"
+    }
+  },
+  "css": {
+    "snippets": {
+
+    }
+  }
+}

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+XDG_DATA_HOME="${XDG_DATA_HOME:-~.local/share}"
+
+cd "$XDG_DATA_HOME" || exit 1
+git clone https://github.com/mbadolato/iTerm2-Color-Schemes colorschemes
+
+git clone https://github.com/alacritty/alacritty-theme
+git clone https://github.com/voronianski/oceanic-next-color-scheme
+git clone https://github.com/whatyouhide/gotham-contrib
+git clone https://github.com/Chick2D/neofetch-themes
+
+mkdir -p tig-themes
+git clone https://github.com/dracula/tig tig-themes/tig-dracula
+git clone https://github.com/ninjabreakbot/tig-gruvbox tig-themes/tig-gruvbox
+
+mkdir -p gitui-themes
+git clone https://github.com/catppuccin/gitui gitui-themes/gitui-catppuccin
+
+

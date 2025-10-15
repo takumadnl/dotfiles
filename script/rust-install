@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
+
+# rustup
+curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+
+# completions
+completion_dir="$XDG_DATA_HOME/zsh/completions"
+mkdir -p $completion_dir
+rustup completions zsh cargo  > $completion_dir/_cargo
+rustup completions zsh rustup > $completion_dir/_rustup
+
+
+# cargo
+xargs -n 1 cargo install < ../packages/rust/cargo-packages
+
+

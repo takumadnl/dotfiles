@@ -1,0 +1,337 @@
+# # プロファイリング用
+# zmodload zsh/zprof && zprof
+
+export PATH
+export MANPATH
+
+# locale
+# if [ "${LANG}" != "ja_JP.UTF-8" ]; then
+  # :
+# fi
+
+export LANG=ja_JP.UTF-8
+# export LC_COLLATE=ja_JP.UTF-8
+export LC_CTYPE=ja_JP.UTF-8
+# export LC_MESSAGES=ja_JP.UTF-8
+# export LC_MESSAGES=en_US.UTF-8
+# export LC_MONETARY=ja_JP.UTF-8
+# export LC_NUMERIC=ja_JP.UTF-8
+# export LC_TIME=ja_JP.UTF-8
+# LC_ALL=
+
+# -U: keep only the first occurrence of each duplicated value
+# ref. http://zsh.sourceforge.net/Doc/Release/Shell-Builtin-Commands.html#index-typeset
+typeset -U PATH path MANPATH manpath
+
+# ignore /etc/zprofile, /etc/zshrc, /etc/zlogin, and /etc/zlogout
+#     ref. http://zsh.sourceforge.net/Doc/Release/Files.html
+#     ref. http://zsh.sourceforge.net/Doc/Release/Options.html#index-GLOBALRCS
+unsetopt GLOBAL_RCS
+# copied from /etc/zprofile
+#     system-wide environment settings for zsh(1)
+if [ -x /usr/libexec/path_helper ]; then
+  eval `/usr/libexec/path_helper -s`
+fi
+
+# =================================
+# XDG Base Directory Specification
+# =================================
+# https://wiki.archlinux.jp/index.php/XDG_Base_Directory_サポート
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_STATE_HOME="${HOME}/.local/state"
+[[ $OSTYPE =~ ^darwin ]] && export XDG_RUNTIME_DIR="${HOME}/Library/Caches/TemporaryItems"
+[[ $OSTYPE =~ ^linux  ]] && export XDG_RUNTIME_DIR="/run/user/${UID}"
+
+# default editor
+export EDITOR=vim
+
+# zsh
+## zshenv以外のファイルのパス
+# export ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
+
+# ========================================
+# Homebrew
+# ========================================
+export HOMEBREW_NO_AUTO_UPDATE=1
+
+if [[ "$(uname -m)" == "arm64" ]]; then
+  export BREW_PREFIX="/opt/homebrew"
+else
+  export BREW_PREFIX="/usr/local"
+fi
+
+# ==============================
+# Development
+# ==============================
+
+# ==========
+# Node.js
+# ==========
+# export NODE_PATH="$(npm root -g 2> /dev/null)"
+export NODE_PATH="${BREW_PREFIX}/lib/node_modules"
+export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/node_repl_history"
+export NODE_OPTIONS="--experimental-repl-await"
+# nvm
+export NVM_DIR="${XDG_DATA_HOME}/nvm"
+# npm
+export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
+# volta
+export VOLTA_HOME="${XDG_DATA_HOME}/volta"
+
+# ==========
+# Ruby
+# ==========
+# ruby gems
+# export GEM_HOME="${XDG_DATA_HOME}/gem"
+# export GEM_SPEC_CACHE="${XDG_CACHE_HOME}/gem"
+
+# z
+export _Z_DATA="${XDG_DATA_HOME}/z/z_data"
+# zoxide
+export _ZO_DATA_DIR="${XDG_DATA_HOME}/zoxide"
+
+# ==========
+# Golang
+# ==========
+export GOPATH="${HOME}/go"
+
+# ==========
+# Python
+# ==========
+export VIRTUAL_ENV_DISABLE_PROMPT="yes"
+
+# PYTHON_COLORS
+#  If this variable is set to 1, the interpreter will colorize various kinds
+#  of output. Setting it to 0 deactivates this behavior.
+export PYTHON_COLORS=1
+
+# JupyterLab / IPython
+export IPYTHONDIR="${XDG_CONFIG_HOME}/jupyter"
+export JUPYTER_DATA_DIR="${XDG_DATA_HOME}/jupyter"
+export JUPYTER_CONFIG_DIR="${XDG_CONFIG_HOME}/jupyter"
+export JUPYTER_PATH="${JUPYTER_DATA_DIR}"
+
+# matplotlib
+export MATPLOTLIBRC=${XDG_CONFIG_HOME}/matplotlib/matplotlibrc
+
+# uv
+export UV_CACHE_DIR="${XDG_CACHE_HOME}/uv"
+
+# pylint
+export PYLINTHOME="${XDG_CACHE_HOME}/pylint"
+
+# pipenv
+#   プロジェクトごとに仮想環境を作成
+# export PIPENV_VENV_IN_PROJECT=1
+
+# ==========
+# Rust
+# ==========
+# rustup
+export RUSTUP_HOME="${XDG_DATA_HOME}/rustup"
+# cargo
+export CARGO_HOME="${XDG_DATA_HOME}/cargo"
+# . "${CARGO_HOME}/env"
+
+# ==========
+# Java
+# ==========
+# openjdk
+export JAVA_HOME=$(/usr/libexec/java_home)
+# export JAVA_HOME=$(/usr/libexec/java_home -v 1.20)
+
+#gradle
+export GRADLE_HOME="${BREW_PREFIX}/bin/gradle"
+
+# ====================
+# Command Line Tool
+# ====================
+
+# less
+export LESSHISTFILE="${XDG_CACHE_HOME}/less/history"
+export LESSKEY="${XDG_CONFIG_HOME}/less/lesskey"
+export LESSCHARSET=utf-8
+export LESSUTFCHARDEF="E000-F8FF:p,F0000-FFFFD:p,100000-10FFFD:p"
+
+# rlrwap
+export RLWRAP_HOME="${XDG_DATA_HOME}/rlwrap"
+
+# byobu
+export BYOBU_PREFIX="${BREW_PREFIX}"
+
+# neofetch custom theme
+#   https://github.com/Chick2D/neofetch-themes
+export NEOFETCH_THEME="${XDG_DATA_HOME}/neofetch-themes/normal/idlifetch.conf"
+
+# git
+export GIT_EDITOR=vim
+export GIT_PAGER="less --quit-if-one-screen --raw-control-chars"
+
+# gitui custom theme
+export GITUI_THEME="theme.ron"
+# export GITUI_THEME="${XDG_DATA_HOME}/gitui-themes/gitui-catppuccin/themes/catppuccin-mocha.ron"
+
+# gibo
+export GIBO_BOILERPLATES="${XDG_DATA_HOME}/gibo/gitignore-boilerplates"
+
+# tmux
+export TMUX_DEFAULT_DIRECTORY="${HOME}"
+
+# tealdeer
+export TEALDEER_CONFIG_DIR="${XDG_CONFIG_HOME}/tealdeer"
+
+# starship
+export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"
+
+# vagrant
+export VAGRANT_HOME="${XDG_DATA_HOME}/vagrant"
+
+# eza
+export EZA_ICON_SPACING=1
+
+# grep
+export GREP_COLOR='38;5;214'
+export GREP_COLORS='mt=38;5;214:fn=38;5;067:ln=38;5;031'
+
+# man config
+# export BROWSER=less
+# export HTMLPAGER=less
+
+
+# fzf
+export FZF_DEFAULT_COMMAND='fd --type file --strip-cwd-prefix'
+export FZF_DEFAULT_OPTS="--layout=reverse --info=inline --height=20 --border=rounded"
+export FZF_CTRL_T_OPTS="\
+--walker-skip .git,node_modules,target \
+--preview 'bat --number --color=always {}' \
+--bind 'ctrl-t:change-preview-window(down|hidden|)'"
+
+# zoxide
+# export _ZO_FZF_OPTS="--layout=reverse --info=inline --border=rounded"
+# export _ZO_FZF_OPTS="
+#   --layout=reverse --info=inline --height=40% --border=rounded
+#   --preview 'eza --color=always {2}' --preview-window=down,4
+# "
+
+
+# ========================================
+# path
+# ========================================
+path=(
+  ${HOME}/bin(N-/)                            # 実行ファイル
+  ${HOME}/.local/bin(N-/)                     # 実行ファイル
+
+  # $(npm bin -g 2> /dev/null)
+  ${BREW_PREFIX}/opt/ruby/bin(N-/)            # ruby (Homebrew)
+  # ${BREW_PREFIX}/opt/python@3.13/bin(N-/)     # python3
+  ${BREW_PREFIX}/opt/python/bin(N-/)          # python3 (Homebrew)
+
+  ${GOPATH}/bin(N-/)                          # golang製ツール
+  ${XDG_DATA_HOME}/cargo/bin(N-/)             # rust製ツール
+  ${XDG_DATA_HOME}/gem/ruby/3.3.0/bin(N-/)    # ruby製ツール (ローカル)
+  ${JAVA_HOME}(N-/)                           # openjdk
+
+  /Applications/MacVim.app/Contents/bin(N-/)  # macvimに同梱されているvimを使う
+  ${BREW_PREFIX}/opt/curl/libexec/gnubin(N-/) # curl
+  ${BREW_PREFIX}/opt/zip/bin(N-/)
+  ${BREW_PREFIX}/opt/unzip/bin(N-/)
+  ${BREW_PREFIX}/bin(N-/)                     # homebrew
+  ${BREW_PREFIX}/sbin(N-/)                    # homebrew
+  # ${BREW_PREFIX}/opt/ncurses/bin(N-/)
+  ${HOME}/google-cloud-sdk/bin(N-/)           # GCP cli
+  ${BREW_PREFIX}/opt/protobuf@3/bin(N-/)      # protobuf
+  ${HOME}/.meteor                             # meteor
+
+  ${VOLTA_HOME}/bin(N-/)                      # nodejs(volta)
+
+  ${BREW_PREFIX}/opt/util-linux/bin           # util-linux
+  ${BREW_PREFIX}/opt/util-linux/sbin
+
+  ${path}
+  # anyenvの優先度は低めにして直接インストールされたものを優先する
+  #   anyenvを使用するときは各環境でdirenvを使用する
+)
+manpath=(
+  ${BREW_PREFIX}/share/man(N-/)                   # homebrew
+  ${BREW_PREFIX}/opt/curl/libexec/gnuman(N-/)     # curl
+  ${BREW_PREFIX}/opt/zip/share/man(N-/)
+  ${BREW_PREFIX}/opt/unzip/share/man(N-/)
+  ${BREW_PREFIX}/opt/bash/share/man(N-/)
+  /Applications/Alacritty.app/Contents/Resources/(N-/) # Alacritty
+  ${manpath}
+)
+# which anyenv > /dev/null && eval "$(anyenv init - --no-rehash)"
+
+
+# ----------
+# vivid
+# ----------
+# VIVID_THEME=gruvbox-dark
+# VIVID_THEME=catppuccin-macchiato
+# VIVID_THEME=iceberg-dark
+# VIVID_THEME=zenburn
+# export VIVID_THEME=oceanic-next
+export VIVID_THEME=kanagawa
+export LS_COLORS=$(vivid generate ${VIVID_THEME})
+
+# ls colorize
+#   di=38;5;109
+#   ln=38;5;175
+#   so=32
+#   pi=39
+#   ex=38;5;167
+#   bd=48;5;235;38;5;66
+#   cd=48;5;235;38;5;214
+#   su=41;30
+#   sg=46;30
+#   tw=42;30
+#   ow=43;30
+# export LS_COLORS='di=38;5;109:ln=38;5;175:so=32:pi=39:ex=38;5;167:bd=48;5;235;38;5;66:cd=48;5;235;38;5;214:su=41;30:sg=46;30:tw=42;30:ow=43;30'
+# export LSCOLORS=exfxcxdxbxegedabagacad
+
+# pager
+# -g or --hilite-search
+#         Normally, less will highlight ALL strings which match the last search
+#         command.  The -g option changes this behavior to highlight only the
+#         particular string which was found by the last search command.  This can
+#         cause less to run somewhat faster than the default.
+
+# -G or --HILITE-SEARCH
+#         The -G option suppresses all highlighting of strings found by search
+#         commands.
+
+export PAGER=less
+export CLICOLOR_FORCE=1
+export LESS='-i -R -M --mouse --wheel-lines=3 --hilite-search'
+export LESSOPEN="|${BREW_PREFIX}/bin/lesspipe.sh %s"
+export LESS_ADVANCED_PREPROCESSOR=1
+# export LV="-Ou8 -c -Sh1;34 -Su1;4;32 -Ss1;33"
+#   LESS_TERMCAP_mb: Begins blinking.
+
+# manpage theme
+# normal
+# export LESS_TERMCAP_md=$'\e[01;34m'     # Begins bold.
+# export LESS_TERMCAP_me=$'\e[0m'         # Ends mode.
+# export LESS_TERMCAP_so=$'\e[01;40;33m'  # Begins standout-mode.
+# export LESS_TERMCAP_se=$'\e[0m'         # Ends standout-mode.
+# export LESS_TERMCAP_us=$'\e[01;32m'     # Begins underline.
+# export LESS_TERMCAP_ue=$'\e[0m'         # Ends underline.
+
+# gotham
+export LESS_TERMCAP_md=$(tput bold; tput setaf 4)     # Begins bold.
+export LESS_TERMCAP_me=$(tput sgr0)                   # Ends mode.
+export LESS_TERMCAP_so=$(tput setaf 214; tput rev) # Begins standout-mode.
+export LESS_TERMCAP_se=$(tput rmso; tput sgr0)        # Ends standout-mode.
+export LESS_TERMCAP_us=$(tput smul; tput bold; tput setaf 2) # Begins underline.
+export LESS_TERMCAP_ue=$(tput rmul; tput sgr0)               # Ends underline.
+
+export LESS_TERMCAP_mr=$(tput rev)               # turn on reverse video mode
+export LESS_TERMCAP_mh=$(tput dim)               # turn on half-bright mode
+export LESS_TERMCAP_ZN=$(tput ssubm)             # Enter subscript mode
+export LESS_TERMCAP_ZV=$(tput rsubm)             # End subscript mode
+export LESS_TERMCAP_ZO=$(tput ssupm)             # Enter superscript mode
+export LESS_TERMCAP_ZW=$(tput rsupm)             # End superscript mode
+
+

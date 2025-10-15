@@ -1,0 +1,77 @@
+
+[env]
+# TERM = "xterm-256color"
+TERM = "alacritty"
+
+[window]
+dimensions = { columns = 120, lines = 40 }
+position = "None"
+padding = { x = 3, y = 0 }
+decorations = "Full"
+opacity = 1.0
+blur = true
+startup_mode = "Windowed"
+
+[scrolling]
+history = 10000
+multiplier = 3
+
+[font]
+# normal = { family = "UDEV Gothic NF",      style = "Regular" }
+normal = { family = "UDEV Gothic NFLG" }
+# normal = { family = "PlemolJP Console NF", style = "Regular" }
+# normal = { family = "HackGen Console NF",  style = "Regular" }
+# normal = { family = "Moralerspace Neon HW", style = "Regular" }
+size = 15
+offset = { x = 0, y = 0 }
+builtin_box_drawing = false
+
+
+[colors]
+draw_bold_text_with_bright_colors = true
+
+[selection]
+save_to_clipboard = true
+
+[cursor]
+style         = { shape = "Beam",  blinking = "Never" }
+vi_mode_style = { shape = "Block", blinking = "Never" }
+
+[terminal]
+# default is user's login shell
+# shell = "zsh"
+
+# osc52 = "Disabled"
+# osc52 = "OnlyPaste"
+osc52 = "CopyPaste"
+
+[mouse]
+hide_when_typing = true
+
+[[hints.enabled]]
+# command = "xdg-open" # On Linux/BSD
+command = "open" # On macOS
+# command = { program = "cmd", args = [ "/c", "start", "" ] } # On Windows
+hyperlinks = true
+post_processing = true
+persist = false
+mouse.enabled = true
+binding = { key = "U", mods = "Control|Shift" }
+regex = "(https://|http://|file:|git://|ftp://)[^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩`]+"
+
+[keyboard]
+bindings = [
+    { key = "F11", action = "ToggleFullScreen" },
+    { key = "¥", chars = "\\" },
+]
+
+[general]
+live_config_reload = true
+working_directory = "None"
+# import = ["~/.local/share/alacritty/themes/themes/gruvbox_dark.toml"]
+# import = ["~/.local/share/alacritty/themes/themes/one_dark.toml"]
+# import = ["~/.local/share/alacritty/themes/themes/kanagawa_wave.toml"]
+import = ["~/.local/share/alacritty/themes/themes/oceanic_next.toml"]
+
+
+

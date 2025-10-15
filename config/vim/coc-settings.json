@@ -1,0 +1,39 @@
+{
+  "tsserver.locale": "ja",
+  "toml.schema.associations": {
+    ".*/starship\\.toml": "https://starship.rs/config-schema.json"
+  },
+  "yaml.schemas": {
+  },
+  "json.schemas": [
+    // "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  ],
+  "[rust]": {
+    "coc.preferences.formatOnSave": true,
+  },
+  "coc.source.around.enable": false, // 現在のバッファの単語
+  "coc.source.buffer.enable": false, // 他のバッファの単語
+  "coc.source.requirements.enable": true,
+  "pyright.inlayHints.functionReturnTypes": false,
+  "pyright.inlayHints.parameterTypes": false,
+  "pyright.inlayHints.variableTypes": false,
+  "rust-analyzer.inlayHints.typeHints.enable": true,
+  "rust-analyzer.inlayHints.chainingHints.enable": true,
+  "rust-analyzer.inlayHints.parameterHints.enable": false,
+  "snippets.ultisnips.pythonPrompt": false,
+  "snippets.ultisnips.enable": true,
+  "snippets.snipmate.enable": true,
+  "snippets.snipmate.trace": false,
+  "snippets.loadVSCodeProjectSnippets": true,
+  "snippets.textmateSnippetsRoots": [
+    "/Users/takuma/.vscode/extensions",
+    "/Users/takuma/.vscode/extensions/xabikos.javascriptsnippets-1.8.0/snippets",
+    "/Users/takuma/Library/Application Support/Code/User/snippets"
+  ],
+  "snippets.excludePatterns": [
+    // "**/*coc-tsserver/snippets/javascript.json",
+    "**/*jquery*"
+  ],
+  "emmet.extensionsPath": "$XDG_CONFIG_HOME/emmet",
+  "solargraph.shell": "/usr/local/bin/zsh"
+}

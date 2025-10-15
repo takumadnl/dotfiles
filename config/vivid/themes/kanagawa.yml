@@ -1,0 +1,148 @@
+colors:
+  fujiWhite:      'dcd7ba' # Default foreground
+  oldWhite:       'c8c093'
+  sumiInk0:       '16161d'
+  sumiInk1:       '1f1f28' # Default background
+  sumiInk2:       '2a2a37'
+  sumiInk3:       '363646'
+  sumiInk4:       '54546d'
+  waveBlue1:      '223249'
+  waveBlue2:      '2d4f67'
+  winterGreen:    '2b3328'
+  winterYellow:   '49443c'
+  winterRed:      '252535'
+  winterBlue:     '76946a'
+  autumnGreen:    'c34043'
+  autumnRed:      'dca561'
+  autumnYellow:   'e82424'
+  waveAqua:       'ff9e3b'
+  dragonBlue:     '6a9589'
+  fujiGray:       '727169'
+  springViolet1:  '938aa9'
+  oniViolet:      '957fb8'
+  crystalBlue:    '7e9cd8'
+  springViolet2:  '9cabca'
+  springBlue:     '7fb4ca'
+  lightBlue:      'acd4d5'
+  waveAqua2:      '7aa89f'
+  springGreen:    '98bb6c'
+  boatYellow1:    '938056'
+  boatYellow2:    'c0a36e'
+  carpYello:      'e6c384'
+  sakuraPink:     'd27e99'
+  waveRed:        'e46876'
+  peachRed:       'ff5d62'
+  surimiOrange:   'ffa066'
+  katanaGray:     '717c7c' # Deprecated
+
+core:
+  normal_text:
+    foreground: fujiWhite
+
+  regular_file:
+    foreground: fujiWhite
+
+  reset_to_normal: {}
+
+  directory:
+    foreground: springBlue
+
+  symlink:
+    foreground: springViolet2
+
+  multi_hard_link: {}
+
+  fifo:
+    foreground: sumiInk0
+    background: waveAqua
+
+  socket:
+    foreground: sumiInk0
+    background: surimiOrange
+
+  door:
+    foreground: sumiInk0
+    background: surimiOrange
+
+  block_device:
+    foreground: sumiInk0
+    background: surimiOrange
+
+  character_device:
+    foreground: sumiInk0
+    background: surimiOrange
+
+  broken_symlink:
+    foreground: sumiInk1
+    background: peachRed
+
+  missing_symlink_target:
+    foreground: sumiInk0
+    background: surimiOrange
+
+  setuid: {}
+
+  setgid: {}
+
+  file_with_capability: {}
+
+  sticky_other_writable: {}
+
+  other_writable: {}
+
+  sticky: {}
+
+  executable_file:
+    foreground: peachRed
+
+text:
+  special:
+    foreground: fujiWhite
+    font-style:
+      - underline
+
+    README.md:
+      foreground: autumnYellow
+
+  todo:
+    font-style: bold
+
+  licenses:
+    foreground: fujiWhite
+
+  configuration:
+    foreground: waveAqua2
+
+  other:
+    foreground: fujiWhite
+
+markup:
+  foreground: fujiWhite
+
+programming:
+  source:
+    foreground: fujiWhite
+
+  tooling:
+    foreground: waveAqua2
+    font-style: underline
+
+    # vcs:
+    #   foreground: fujiWhite
+
+
+media:
+  foreground: sakuraPink
+
+office:
+  foreground: peachRed
+
+archives:
+  foreground: peachRed
+
+executable:
+  foreground: peachRed
+
+unimportant:
+  foreground: katanaGray
+

@@ -1,0 +1,46 @@
+# # Ghostty Configuration #
+
+# ====================
+# ## general ##
+# ====================
+# fullscreen = true
+window-height = 40
+window-width = 120
+
+quit-after-last-window-closed = true
+
+scrollback-limit = 10000
+
+title = "👻 Ghostty"
+
+
+# ====================
+# ## font ##
+# ====================
+# font-family = "HackGen Console NF"
+# font-family = "PlemolJP Console NF"
+# font-family = "UDEV Gothic NF"
+font-family = "UDEV Gothic NFLG"
+font-size = 15
+
+# font-thicken = true
+
+bold-is-bright = true
+
+
+# ====================
+# ## color theme ##
+# ====================
+# theme = "Kanagawa Wave"
+theme = "Oceanic-Next"
+# theme = "GruvboxDarkHard"
+
+
+# ====================
+# ## keybindings ##
+# ====================
+# keybind = ctrl+l=csi:22J
+keybind = f11=toggle_fullscreen
+keybind = super+r=reload_config
+
+

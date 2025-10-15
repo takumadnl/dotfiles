@@ -1,0 +1,121 @@
+if [ "${LANG}" != "ja_JP.UTF-8" ]; then
+  export LANG=ja_JP.UTF-8
+  # export LC_COLLATE=ja_JP.UTF-8
+  export LC_CTYPE=ja_JP.UTF-8
+  export LC_MESSAGES=C
+  # export LC_MONETARY=ja_JP.UTF-8
+  # export LC_NUMERIC=ja_JP.UTF-8
+  # export LC_TIME=ja_JP.UTF-8
+  # LC_ALL=
+  # :
+fi
+
+# ページャ
+export PAGER=less
+export CLICOLOR_FORCE=1
+export LESS='-i -R -M --mouse --wheel-lines=3'
+case $OSTYPE in
+  darwin*) export LESSOPEN="|/usr/local/bin/lesspipe.sh %s" ;;
+  linux*)
+    os_release_id="$(grep '^ID=' /etc/os-release | cut -d'=' -f2)"
+    case $os_release_id in
+      *rocky*) export LESSOPEN="|/usr/bin/lesspipe.sh %s" ;;
+      *) eval "$(lesspipe)" ;;
+    esac
+    ;;
+  *) ;;
+esac
+export LESS_ADVANCED_PREPROCESSOR=1
+# export LV="-Ou8 -c -Sh1;34 -Su1;4;32 -Ss1;33"
+#   LESS_TERMCAP_mb: Begins blinking.
+export LESS_TERMCAP_md=$'\e[01;34m'     # Begins bold.
+export LESS_TERMCAP_me=$'\e[0m'         # Ends mode.
+export LESS_TERMCAP_so=$'\e[01;40;33m'  # Begins standout-mode.
+export LESS_TERMCAP_se=$'\e[0m'         # Ends standout-mode.
+export LESS_TERMCAP_us=$'\e[01;32m'     # Begins underline.
+export LESS_TERMCAP_ue=$'\e[0m'         # Ends underline.
+
+# デフォルトのエディタ
+export EDITOR=vim
+export GIT_EDITOR=vim
+
+# =================================
+# XDG Base Directory Specification
+# =================================
+# https://wiki.archlinux.jp/index.php/XDG_Base_Directory_サポート
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_STATE_HOME="${HOME}/.local/state"
+[[ $OSTYPE =~ ^darwin ]] && export XDG_RUNTIME_DIR="${HOME}/Library/Caches/TemporaryItems"
+[[ $OSTYPE =~ ^linux  ]] && export XDG_RUNTIME_DIR="/run/user/${UID}"
+
+# fzf
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_DEFAULT_OPTS="--layout=reverse --inline-info"
+
+# readline
+export INPUTRC="${XDG_CONFIG_HOME}/readline/inputrc"
+
+# 履歴に同じコマンドを記録しない
+export HISTCONTROL=ignoredups
+
+# BLACK="0;30"
+# BLUE="0;34"
+# GREEN="0;32"
+# CYAN="0;36"
+# RED="0;31"
+# PURPLE="0;35"
+# BROWN="0;33"
+
+# END_COLOR="\[\e[00m\]"
+# PROMPT_COLOR="$BROWN"
+# START_COLOR="\[\e[${PROMPT_COLOR}m\]"
+# export PS1="${START_COLOR}\u@\h: \w \n\\$ ${END_COLOR}"
+# export PS2="> "
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "${HOME}/bin" ] ; then
+  PATH="${HOME}/bin:${PATH}"
+fi
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "${HOME}/.local/bin" ] ; then
+  PATH="${HOME}/.local/bin:${PATH}"
+fi
+
+if [[ $OSTYPE =~ ^darwin ]] ; then
+  export PATH="${PATH}:/Applications/MacVim.app/Contents/bin"
+fi
+
+if [[ $OSTYPE =~ ^linux ]] ; then
+  [ -d /home/linuxbrew/.linuxbrew ] &&
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+if [ type cargo > /dev/null 2>&1 ]; then
+  # . "/Users/takuma/.local/share/cargo/env"
+  export PATH="${PATH}:${XDG_DATA_HOME}/cargo/bin"
+fi
+
+if [[ $OSTYPE =~ ^linux ]] ; then
+  export MANPATH="${HOME}/.local/share/man:"
+fi
+
+export STARSHIP_CONFIG=${XDG_CONFIG_HOME}/starship/starship.toml
+
+# export DISPLAY=localhost:0.0
+# alias xsel='xsel --display :0'
+
+# if [ -x /usr/bin/Xvfb ] && [ -x /usr/bin/VBoxClient ] && [ ! -f /tmp/.X0-lock ]; then
+#   Xvfb -screen 0 320x240x8 > /dev/null 2>&1 &
+#   sleep 0.5
+#   VBoxClient --clipboard
+# fi
+
+if [ -f ~/.bashrc ]; then
+  source ~/.bashrc
+fi
+
+export VOLTA_HOME="${XDG_DATA_HOME}/volta"
+export PATH="$VOLTA_HOME/bin:$PATH"

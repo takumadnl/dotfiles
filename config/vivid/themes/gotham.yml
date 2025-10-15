@@ -1,0 +1,136 @@
+# Oceanic Next
+#
+colors:
+
+  base0:   "0c1014"
+  base1:   "11151c"
+  base2:   "091f2e"
+  base3:   "0a3749"
+  base4:   "245361"
+  base5:   "599cab"
+  base6:   "99d1ce"
+  base7:   "d3ebe9"
+  red:     "c23127"
+  orange:  "d26937"
+  yellow:  "edb443"
+  magenta: "888ca6"
+  violet:  "4e5166"
+  blue:    "195466"
+  cyan:    "33859e"
+  green:   "2aa889"
+
+  bg:      "0c1014" # base0
+  main-fg: "99d1ce" # base6
+
+core:
+
+  normal_text:
+    foreground: main-fg
+  regular_file: {}
+  reset_to_normal: {}
+
+  directory:
+    # foreground: blue
+    foreground: cyan
+    # foreground: base5
+
+  symlink:
+    foreground: cyan
+    # foreground: violet
+
+  multi_hard_link: {}
+
+  fifo:
+    foreground: base0
+    background: blue
+
+  socket:
+    foreground: base0
+    background: orange
+
+  door:
+    foreground: base0
+    background: orange
+
+  block_device:
+    foreground: base0
+    background: orange
+
+  character_device:
+    foreground: base0
+    background: orange
+
+  broken_symlink:
+    foreground: base1
+    background: red
+
+  missing_symlink_target:
+    foreground: base0
+    background: orange
+
+  setuid: {}
+
+  setgid: {}
+
+  file_with_capability: {}
+
+  sticky_other_writable: {}
+
+  other_writable: {}
+
+  sticky: {}
+
+  executable_file:
+    foreground: red
+
+text:
+  special:
+    foreground: main-fg
+    font-style:
+      - underline
+
+  todo:
+    font-style: bold
+
+  licenses:
+    foreground: main-fg
+
+  configuration:
+    foreground: yellow
+    # foreground: orange
+
+  other:
+    foreground: main-fg
+
+markup:
+  foreground: main-fg
+
+programming:
+  source:
+    foreground: main-fg
+
+  tooling:
+    foreground: yellow
+    # foreground: orange
+    font-style: underline
+
+    vcs:
+      foreground: main-fg
+
+media:
+  foreground: orange
+
+office:
+  foreground: red
+
+archives:
+  foreground: red
+
+executable:
+  foreground: red
+  # font-style: bold
+
+unimportant:
+  foreground: blue
+
+

@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# shellcheck disable=2086,2046
+
+dotfiles_root=$HOME/dotfiles
+
+
+link_config () {
+  local config_root=$dotfiles_root/config
+  local XDG_CONFIG_HOME=$HOME/.config
+  local real_config dest_dir dest_symlink
+
+  echo "# link to $XDG_CONFIG_HOME #"
+  echo
+
+  find $config_root -type f | {
+    while read -r real_config; do
+      dest_dir=$XDG_CONFIG_HOME/$(dirname "${real_config}" | sed "s%${config_root}/%%")
+      dest_symlink=$dest_dir/$(basename "${real_config}")
+
+      if [[ -h "${dest_symlink}" &&
+            $(readlink "${dest_symlink}") == "${real_config}" ]]; then
+        printf "%-60s  \n" "${dest_symlink}"
+        continue
+      fi
+
+      if [[ -f "${dest_symlink}" ]]; then
+        rm "${dest_symlink}"
+      fi
+
+      mkdir -p "${dest_dir}"
+      ln -s "${real_config}" "${dest_symlink}"
+      printf "%-60s  \n" "${dest_symlink}"
+    done
+  }
+  echo
+
+  echo "## remove broken symlink ##"
+  echo
+
+  local broken_symlink
+  find -L $XDG_CONFIG_HOME -type l | {
+    while read -r broken_symlink; do
+      rm "${broken_symlink}"
+      echo "${broken_symlink} has been removed due to a broken symlink."
+    done
+  }
+  echo
+}
+
+link_homedir () {
+  local config_root=$dotfiles_root/home
+  local real_config dest_symlink
+
+  echo "# link to homedir #"
+  echo
+
+  find $config_root -type f | {
+    while read -r real_config; do
+      dest_symlink="${HOME}/.$(basename $real_config)"
+
+      if [[ -h $dest_symlink && $(readlink $dest_symlink) == "${real_config}" ]]; then
+        printf "%-40s  \n" $dest_symlink
+        continue
+      fi
+
+      ln -s $real_config $dest_symlink
+    done
+  }
+  echo
+}
+
+
+link_config
+echo ---
+link_homedir
+
+
+
+

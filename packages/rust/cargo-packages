@@ -1,0 +1,13 @@
+cargo-binstall@1.15.7
+cargo-edit@0.13.7
+cargo-llvm-cov@0.6.19
+cargo-make@0.37.24
+cargo-update@18.0.0
+cargo-watch@8.5.3
+create-tauri-app@4.6.2
+diesel_cli@2.3.2
+evcxr_jupyter@0.21.1
+hyperfine@1.19.0
+rustlings@6.5.0
+tauri-cli@2.8.4
+workshop-runner@0.2.4

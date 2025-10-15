@@ -1,0 +1,9 @@
+# Pry.config.print = proc {}
+Pry.config.prompt = Pry::Prompt.new(
+  :simple_prompt,
+  "Simple Prompt",
+  [proc { ">> " }]
+)
+
+
+

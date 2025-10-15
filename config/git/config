@@ -1,0 +1,31 @@
+[user]
+	name = takumadnl
+	email = takumadnl@gmail.com
+[core]
+	pager = 'less --quit-if-one-screen --raw-control-chars'
+	ui = auto
+	excludesfile = /Users/takuma/.config/git/gitignore_global
+	compression = 0
+[color]
+	diff = auto
+	status = auto
+	branch = auto
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+[commit]
+	template = /Users/takuma/.config/git/stCommitMsg
+[credential]
+	helper = store
+[http]
+	postBuffer = 500M
+	maxRequestBuffer = 100M
+[init]
+	defaultBranch = main
+[log]
+	date = iso-local
+[alias]
+	graph = log --oneline --graph

@@ -1,0 +1,1308 @@
+# (~/zshrc 冒頭)
+# f in ~/.zshenv, executed `unsetopt GLOBAL_RCS` and ignored /etc/zshrc
+[ -r /etc/zshrc ] && . /etc/zshrc
+
+# disable `bracketed paste mode`
+#   コピペしたときに即時実行抑止の文字列が挿入されないようにする
+unset zle_bracketed_paste
+
+# 補完時にスペースを削除しない
+# ZLE_REMOVE_SUFFIX_CHARS=$' \t\n;&|'
+ZLE_REMOVE_SUFFIX_CHARS=
+
+# option
+# setopt PRINT_EXIT_VALUE
+setopt AUTO_MENU
+# setopt AUTO_LIST
+# compacked complete list display
+setopt LIST_PACKED
+# show filetype when complete list display
+setopt LIST_TYPES
+# no beep sound when complete list displayed
+setopt NO_LIST_BEEP
+setopt NO_CORRECT
+# auto directory pushd that you can get dirs list by cd -[tab]
+setopt AUTO_PUSHD
+
+## Command history configuration
+HISTFILE=${HOME}/.zsh_history
+HISTSIZE=50000
+SAVEHIST=50000
+setopt HIST_IGNORE_DUPS     # ignore duplication command history list
+setopt SHARE_HISTORY        # share command history data
+setopt BANG_HIST            # expand sptifical '!' (history command)
+# remove from the history when the first character on the line is a space.
+setopt HIST_IGNORE_SPACE
+
+autoload -Uz add-zsh-hook
+
+autoload colors
+colors
+
+# history plugin
+autoload history-search-end
+zle -N history-beginning-search-backward-end history-search-end
+zle -N history-beginning-search-forward-end history-search-end
+
+# disable default ctrl-q ctrl-s
+stty stop  undef
+stty start undef
+
+# vi-like keybind
+KEYTIMEOUT=20
+bindkey -v
+bindkey 'jj' vi-cmd-mode
+# bindkey -M viins '\er' history-incremental-pattern-search-forward
+bindkey -M viins '^?'  backward-delete-char
+bindkey -M viins '^A'  beginning-of-line
+bindkey -M viins '^B'  backward-char
+# bindkey -M viins '^D'  delete-char-or-list
+bindkey -M viins '^E'  end-of-line
+# bindkey -M viins '^F'  forward-char
+bindkey -M viins '^G'  send-break
+# bindkey -M viins '^H'  backward-delete-char
+bindkey -M viins '^H'  kill-word
+bindkey -M viins '^K'  kill-line
+# bindkey -M viins '^N'  down-line-or-history
+# bindkey -M viins '^P'  up-line-or-history
+bindkey -M viins '^N'  history-beginning-search-forward-end
+bindkey -M viins '^P'  history-beginning-search-backward-end
+# bindkey -M viins '^R'  history-incremental-pattern-search-backward
+bindkey -M viins '^U'  backward-kill-line
+bindkey -M viins '^W'  backward-kill-word
+bindkey -M viins '^Y'  yank
+bindkey -M viins '^_'  insert-last-word
+
+
+source_if() {
+  local file_path=$1
+  if [ ! -f "${file_path}" ]; then
+    failure "${file_path}: no such file or directory"
+    return 1
+  fi
+  source ${file_path} #|| failure "${file_path}: error occured ($?)"
+}
+
+# completion
+fpath=(
+  # ${BREW_PREFIX}/share/zsh/site-functions
+  ${BREW_PREFIX}/share/zsh-completions
+  ${XDG_DATA_HOME}/zsh/completions
+  /opt/vagrant/embedded/gems/gems/vagrant-*/contrib/zsh
+  # /opt/vagrant/embedded/gems/gems/vagrant-2.4.0/contrib/zsh
+  ${HOME}.docker/completions
+  $fpath
+)
+autoload -Uz compinit
+compinit -C
+# C: セキュリティチェックを行わない
+
+autoload -U bashcompinit
+bashcompinit
+
+# The next line enables shell command completion for gcloud.
+###### source_if '/Users/takuma/google-cloud-sdk/completion.zsh.inc'
+
+zstyle ':completion:*:default' list-colors \
+  ${(s.:.)LS_COLORS} \
+  '=(#b)*(--> *)=94=0' \
+  '=*=94'
+
+# 大文字小文字を無視して補完する
+# わざわざ大文字を入力した時は小文字の候補を補完しない
+# でもやっぱり大文字の候補が見つからない場合には, 小文字の候補を補完する
+zstyle ':completion:*' matcher-list \
+  'm:{[:lower:]}={[:upper:]}' \
+  '+m:{[:upper:]}={[:lower:]}'
+zstyle ':completion:*' group-name ''
+# グループ化での説明を追加出来る %dに説明が入る
+zstyle ':completion:*:descriptions' format 'Completing %d'
+
+# オプションの補完時のデザイン
+zstyle ':completion:*' list-separator '-->'
+# zstyle ':completion:*:options'     list-colors '=(#b)*(--> *)=94=97' '=*=94'
+# 設定したデザインの表示を許可する
+zstyle ':completion:*:manuals' separate-sections true
+
+# 補完のメニューが表示されるかつ選択を行うことができる
+zstyle ':completion:*:setopt:*' menu true select
+zstyle ':completion:*:options' description 'yes'
+
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+
+# アンダースコアから始まる関数は補完対象としない
+#   擬似的なprivate関数
+zstyle ':completion:*:functions'  ignored-patterns '_*'
+# 変数も同様
+zstyle ':completion:*:parameters' ignored-patterns '_*'
+
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path $XDG_CACHE_HOME/zsh/cache
+
+# ファイル名の補完対象からlockファイルを除外する
+#     Cargo.lock Pipfile.lock flake.lock mix.lock
+#     poetry.lock yarn.lock
+#     package-lock.json
+zstyle ':completion:*:*files' ignored-patterns '*.lock' 'package-lock.json' '*.zwc'
+
+# コマンドラインの区切り文字を変更する
+# bash   Word characters are alphanumeric characters only.
+
+# normal As in normal shell operation:  word characters are alphanumeric
+#        characters plus any characters present in the string given by the
+#        parameter $WORDCHARS.
+
+# shell  Words are complete shell command arguments, possibly including
+#        complete quoted strings, or any tokens special to the shell.
+
+# whitespace
+#        Words are any set of characters delimited by whitespace.
+
+# default
+#        Restore the default settings; this is usually the same as
+#        `normal'.
+autoload -Uz select-word-style
+select-word-style default
+# The style word-style specifies the rules to use.  This may have the
+# following values.
+
+# normal Use the standard shell rules, i.e. alphanumerics and $WORDCHARS,
+#        unless overridden by the styles word-chars or word-class.
+
+# specified
+#        Similar to normal, but only the specified characters, and not also
+#        alphanumerics, are considered word characters.
+
+# unspecified
+#        The negation of specified.  The given characters are those which
+#        will not be considered part of a word.
+
+# shell  Words are obtained by using the syntactic rules for generating
+#        shell command arguments.  In addition, special tokens which are
+#        never command arguments such as `()' are also treated as words.
+
+# whitespace
+#        Words are whitespace-delimited strings of characters.
+zstyle ':zle:*' word-chars " _/:;@"
+zstyle ':zle:*' word-style unspecified
+
+## prediction configuration
+# autoload -U predict-on
+# predict-off
+
+# ====================
+# コマンド確認
+# ====================
+available() {
+  # typeはPOSIX標準
+  # whichはPOSIX標準ではないらしい
+  type "$@" > /dev/null 2>&1
+}
+
+non_available() {
+  ! available "$@"
+}
+
+# aliases
+if available eza; then
+  alias eza='command eza --time-style=iso'
+  alias ls='eza'
+  alias ll='eza -hlgF --icons=always'
+  alias la='eza -a'
+  alias lla='eza -hlgaF --icons=always'
+  alias l='eza -1'
+  ## Show hidden files ##
+  alias l.='eza -d .*'
+else
+  case "${OSTYPE}" in
+    freebsd*|darwin*)
+      alias ls='ls -G'
+      alias ll='ls -lFg -G'
+      alias la='ls -a -G'
+      alias lla='ls -lFga -G'
+      alias l='ls -1'
+      ## Show hidden files ##
+      alias l.='ls -d -G .*'
+      ;;
+    linux*)
+      alias ls='ls --color'
+      alias ll='ls -lFg --color'
+      alias la='ls -a --color'
+      alias lla='ls -lFga --color'
+      alias l='ls -1'
+      ## Show hidden files ##
+      alias l.='ls -d --color .*'
+      ;;
+  esac
+fi
+alias zshconfig='vim ~/.zshrc'
+alias zshrc='vim ~/.zshrc'
+alias zshenv='vim ~/.zshenv'
+alias zprofile='vim ~/.zprofile'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias ggrep='ggrep --color=auto'
+# alias vscode='code'
+alias cd..='cd ..'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ..2='cd ../..'
+alias ..3='cd ../../..'
+alias ..4='cd ../../../..'
+alias now='date +%T'
+alias today='date +%F'
+alias datetime='date "+%F %T"'
+alias whatis='env PAGER=cat whatis'
+alias apropos='env PAGER=cat apropos'
+alias rm='rm -I'
+available tmux     && alias tmux='direnv exec / tmux'
+available tmux     && alias t='tmux new -c ${TMUX_DEFAULT_DIRECTORY:-~} -s main'
+# available bat      && alias cat='bat'
+available tree     && alias tree='tree --gitignore'
+# available tree     && alias tree='tree -NC --gitignore'
+# available fd tree  && alias tree='roughtree'
+# available irb      && alias irb="irb --readline"
+available ptpython && alias ptpython="ptpython --config-file $XDG_CONFIG_HOME/ptpython/config.py"
+available ptpython && alias ppy='ptpython'
+available jq       && alias jq='jq -C'
+available pyenv    && alias brew="env PATH=${PATH//$(pyenv root)\/shims:/} brew" # `brew doctor`の警告回避
+# available tldr     && alias tldr="__tldr-customize"
+# available tldr     && alias tldr="tldr --config=${XDG_CONFIG_HOME}/tlrc/config.toml --language en"
+available tldr     && alias tldr='tldr_platform_fallback'
+# available tldr     && alias tldr='tldr --language en --platform macos --platform linux'
+available fortune  && alias fortune="fortune ${XDG_DATA_HOME}/fortune | sed 's/　/  /g'"
+available git      && alias gitn='git --no-pager'
+available git      && alias git-hash="git log --oneline | fzf --preview='git show --color=always {1}' | hck -f 1 | xargs git rev-parse"
+available gh       && alias github='gh repo view --web'
+available gitui    && alias gitui='gitui --theme ${GITUI_THEME}'
+available ip       && alias ip='ip --color=auto'
+available neofetch && alias neofetch='neofetch --config ${NEOFETCH_THEME}'
+available ag       && alias ag='ag --color-line-number="38;5;031" --color-match="38;5;214" --color-path="38;5;067"'
+available yazi     && alias yz='yazi'
+# alias -g F='| $(fzf)'
+# alias -g L='| less'
+alias opera='open -a opera'
+alias firefox='open -a firefox'
+alias chrome='open -a "Google Chrome"'
+alias timezsh='for i in $(seq 1 10); do time zsh -i -c exit; done'
+
+alias pip='_pip(){
+  if [ $1 = "search" ]; then
+    pip_search --date_format %Y-%m-%d "$2";
+  else
+    pip3 "$@";
+  fi;
+};_pip'
+
+() {
+  local os_type="$(uname -s)"
+  case "$os_type" in
+    Darwin)                    OS_ICON=" " ;;
+    SunOS)                     OS_ICON=" " ;;
+    CYGWIN_NT-* | MSYS_NT-*)   OS_ICON=" " ;;
+    FreeBSD|DragonFly)         OS_ICON=" " ;;
+    OpenBSD)                   OS_ICON=" " ;;
+    Linux)
+      local os_release_id="$(awk -F '=' '/^ID=/ {print $2}' /etc/os-release)"
+      case $os_release_id in
+        *arch*)                OS_ICON=" " ;;
+        *manjaro*)             OS_ICON=" " ;;
+        *endeavouros*)         OS_ICON=" " ;;
+        *garuda*)              OS_ICON=" " ;;
+
+        *debian*)              OS_ICON=" " ;;
+        *ubuntu*)              OS_ICON=" " ;;
+        *mint*)                OS_ICON=" " ;;
+        *devuan*)              OS_ICON=" " ;;
+        *deepin*)              OS_ICON=" " ;;
+        *raspbian*)            OS_ICON=" " ;;
+        *elementary*)          OS_ICON=" " ;;
+        *zorin*)               OS_ICON=" " ;;
+        *pop*)                 OS_ICON=" " ;;
+        *kali*)                OS_ICON=" " ;;
+        *mxlinux*)             OS_ICON=" " ;;
+        *kubuntu*)             OS_ICON=" " ;;
+
+        *redhat*)              OS_ICON=" " ;;
+        *fedora*)              OS_ICON=" " ;;
+        *centos*)              OS_ICON=" " ;;
+        *alma*)                OS_ICON=" " ;;
+        *rocky*)               OS_ICON=" " ;;
+
+        *alpine*)              OS_ICON=" " ;;
+        *coreos*)              OS_ICON=" " ;;
+        *gentoo*)              OS_ICON=" " ;;
+        *mandriva*)            OS_ICON=" " ;;
+        *mageia*)              OS_ICON=" " ;;
+        *opensuse*)            OS_ICON=" " ;;
+        *tumbleweed*)          OS_ICON=" " ;;
+        *sabayon*)             OS_ICON=" " ;;
+        *slackware*)           OS_ICON=" " ;;
+        *aosc*)                OS_ICON=" " ;;
+        *nixos*)               OS_ICON=" " ;;
+        *solus*)               OS_ICON=" " ;;
+        *arduino*)             OS_ICON=" " ;;
+        *)                     OS_ICON=" " ;;
+      esac
+      ;;
+    *) OS_ICON="" ;;
+  esac
+}
+export OS_ICON
+
+# ====================
+# mkdir and cd
+# ====================
+function mkd() {
+  mkdir -p "$@" && cd $_
+}
+
+# ====================
+# create empty file
+# ====================
+function mkfile() {
+  if [ $# -lt 1 ]; then
+    echo "file path is required." 1>&2
+    return 1
+  fi
+  for file_path in "$@"; do
+    if [ -e "$file_path" ]; then
+      echo "$file_path: already exists." 1>&2
+      continue
+    fi
+    if [[ $file_path = */ ]]; then
+      # 最後が"/"のパスが指定された場合は空のディレクトリを作成する
+      mkdir -p $file_path
+      continue
+    fi
+
+    local parent_dir=$(dirname $file_path)
+    mkdir -p $parent_dir
+    : > $file_path
+  done
+}
+
+function mkcbz() {
+  local target=$1
+  command ls -1 $target |
+    zip -@ \
+      --recurse-paths  \
+      --no-dir-entries \
+      --latest-time    \
+      $target.cbz
+}
+
+function failure() {
+  echo "$*" 1>&2
+  return 1
+}
+
+function success() {
+  echo "$*"
+  return 0
+}
+
+function important() {
+  tput bold
+  echo "$*"
+  tput sgr0
+}
+
+function error() {
+  tput setaf 1 # red
+  echo -n "Error: "
+  tput sgr0
+  echo "$*"
+}
+
+function warn() {
+  tput setaf 3 # yellow
+  echo -n "Warning: "
+  tput sgr0
+  echo "$*"
+}
+
+function info_log() {
+  tput setaf 4 # blue
+  echo -n "Info: "
+  tput sgr0
+  echo "$*"
+}
+
+function sweep-screen() {
+  {
+    repeat 10; do
+      echo
+    done
+
+    local opt OPTARG
+    getopts "tm:" opt # 簡易なコマンドなのでオプションは１つのみ
+    case "$opt" in
+      t|time)
+        echo '──────────────────────────────'
+        date '+%Y-%m-%d %H:%M:%S'
+        echo '──────────────────────────────'
+        echo
+        ;;
+      m|message)
+        echo '──────────────────────────────'
+        echo "$OPTARG"
+        echo '──────────────────────────────'
+        echo
+        ;;
+      *)
+        echo '──────────────────────────────'
+        echo
+        ;;
+    esac
+  } | fmt -w $(tput cols) -c
+}
+# zle -N sweep-screen
+# bindkey '^S' sweep-screen
+
+# ====================
+# copy to clipboard
+# ====================
+function p() {
+  # TODO: linux 対応
+  if [[ ! -p /dev/stdin ]]; then
+    failure "copy from stdin only"
+    return 1
+  fi
+
+  local text=$(cat -)
+  # 末尾の改行を削除してコピー
+  echo -n $text | pbcopy
+}
+
+# ====================
+# cd project root dir
+# ====================
+function g() {
+  local project_root=$(git rev-parse --show-toplevel)
+  if [ -n "$project_root" ]; then
+    cd $project_root
+  else
+    cd
+  fi
+  # git rev-parse --is-inside-work-tree => "true"/"false"
+  # cargo locate-project --message-format plain | xargs dirname
+  # cargo locate-project --workspace --message-format plain | xargs dirname
+}
+
+table() {
+  local file_name=$1
+  case $file_name in
+    *.csv|*.CSV) separator=','   ;;
+    *.tsv|*.TSV) separator=$'\t' ;;
+    *)           separator=      ;;
+  esac
+  if [ -n $sep ]; then
+    column --table --separator=$separator $file_name
+  else
+    column --table $file_name
+  fi
+}
+
+# ====================
+# 指定のパスにファイルを移動する
+# 元の場所にはシンボリックリンクを作成する
+# ====================
+shadow() {
+  local src_path=$1
+  local dst_path=$2
+  mv $src_path $dst_path
+
+  # mvの結果、実体の場所が変わっていることに注意
+  #   $dst_path が実体
+  local sym_path=$src_path
+  local real_path=$dst_path
+  ln -s $real_path $sym_path
+}
+collect-dotfile() {
+  local src=$1
+  local category=$2
+  local filename=$(basename "${src}" | tr -d '.')
+  local path_dotfiles="${HOME}/dotfiles/$2"
+
+  mv $src "${path_dotfiles}${dst}${filename}"
+  ln -s "${path_dotfiles}/${filename}" "${src}"
+}
+
+# ====================
+# break a line
+# ====================
+br() {
+  tr "${1-[[:space:]]}" '\n'
+}
+
+# ====================
+# $PATH HumanReadable
+# ====================
+function path() {
+  printenv PATH | tr ':' '\n'
+}
+
+# search env
+function senv() {
+  setopt localoptions NO_CASE_MATCH # 正規表現の大文字・小文字無視
+  local keyword env_entry env_name
+
+  for keyword in "$@" ; do
+
+    printenv | {
+      while read -r env_entry ; do
+        env_name=${env_entry%%=*}
+
+        # 表示に問題が出やすいものだけ除外
+        case $env_name in
+          LS_COLORS|LESS_TERMCAP*)
+            continue ;;
+        esac
+
+        if [[ $env_name =~ $keyword ]]; then
+          echo $env_entry
+        fi
+      done
+    } |
+      sort --field-separator='=' --key=1 |
+      ag "${keyword}(?=[^=]*=)"
+
+  done
+}
+
+# SGRなどのANSIエスケープシーケンスを削除する
+function esc-clean() {
+  sed -E 's/\x1b\[[0-9;]*m//g'
+}
+
+function opts() {
+  if [[ ! -p /dev/stdin ]]; then
+    return 1
+  fi
+
+  if [[ -z "$1" ]]; then
+    return 1
+  fi
+
+  local opt OPTARG
+  getopts 's:l:' opt
+
+  case "$opt" in
+    l|long)
+      shift
+      local IFS='|'
+      local long_options="$*"
+      cat - |
+        esc-clean |
+        ag --after=1 "\s+--(${long_options})\b"
+      ;;
+    s|short|*)
+      local short_options=${OPTARG:-$1}
+      cat - |
+        esc-clean |
+        ag --case-sensitive \
+           --after=1 \
+           "\s+-[${short_options}](?=[,\s])"
+      ;;
+  esac
+
+}
+
+function refresh() {
+  if [[ "$1" = '-f' ]]; then
+    rm -f $HOME/.zcompdump
+  fi
+  exec $SHELL -l
+}
+
+function dularge() {
+  local dir=${1:-.}
+  # local path='*'
+  du -sh $dir/* |
+    sort --human-numeric-sort --key 1 |
+    ag '^\s*\d+(\.\d+)?[GM]'
+}
+
+function quote() {
+  local opt
+  getopts 'sd' opt
+  case "$opt" in
+    s|single)   local quote_str=\' ;;
+    d|double|*) local quote_str=\" ;;
+  esac
+
+  while read line ; do
+    echo ${quote_str}${line}${quote_str}
+  done
+}
+
+function fontlist() {
+  local fontname=${1-".*"}
+
+  fc-list : family |
+    ag $fontname |
+    hck -d ',' -f 1 |
+    sort |
+    uniq
+}
+
+function fontlist-mono() {
+  # 等幅のみ
+  local fontname=${1-".*"}
+
+  {
+    fc-list :spacing=90  family;
+    fc-list :spacing=100 family;
+  } |
+    ag $fontname |
+    hck -d ',' -f 1 | # 大抵一番目に主要な名称がある
+    sort |
+    uniq
+}
+
+is_stdin_tty() {
+  [[ -t 0 ]]
+}
+
+is_stdout_tty() {
+  [[ -t 1 ]]
+}
+
+is_stderr_tty() {
+  [[ -t 2 ]]
+}
+
+is_digit() {
+  local target=$1
+  is_decimal $target ||
+    is_hexiadecimal $target ||
+    is_binary $target ||
+    is_octal $target
+}
+
+is_decimal() {
+  local target=$1
+  [[ "${target}" =~ ^[[:digit:]]+$ ]]
+}
+
+is_hexiadecimal() {
+  local target=$1
+  [[ "${target}" =~ ^(0x|0X)([0-9a-f]+|[0-9A-F]+)$ ]]
+}
+
+is_binary() {
+  local target=$1
+  [[ "${target}" =~ ^(0b|0B)[0-1]+$ ]]
+}
+
+is_octal() {
+  local target=$1
+  [[ "${target}" =~ ^(0o|0O)[0-7]+$ ]]
+}
+
+hex() {
+  local num
+  if [[ -p /dev/stdin || -f /dev/stdin ]]; then
+    read num
+  else
+    num=$1
+  fi
+  if ! is_digit $num; then
+    failure "need a digit"
+    return
+  fi
+  # python3 -c "print(hex(${num}))"
+  python3 -c "print(f'0x{${num}:X}')"
+}
+
+oct() {
+  local num
+  if [[ -p /dev/stdin || -f /dev/stdin ]]; then
+    read num
+  else
+    num=$1
+  fi
+  if ! is_digit $num; then
+    failure "need a digit"
+    return
+  fi
+  python3 -c "print(oct(${num}))"
+}
+
+bin() {
+  local num
+  if [[ -p /dev/stdin || -f /dev/stdin ]]; then
+    read num
+  else
+    num=$1
+  fi
+  if ! is_digit $num; then
+    failure "need a digit"
+    return
+  fi
+  python3 -c "print(bin(${num}))"
+}
+
+dec() {
+  local num
+  if [[ -p /dev/stdin || -f /dev/stdin ]]; then
+    read num
+  else
+    num=$1
+  fi
+  if ! is_digit $num; then
+    failure "need a digit"
+    return
+  fi
+  python3 -c "print(int(${num}))"
+}
+
+# ====================
+# homebrew
+# ====================
+function brew_deps_check() {
+  # brew list --formula | xargs -I{} sh -c 'brew uses --installed {} | wc -l | xargs printf "%20s is used by %2d formulae.\n" {}'
+  brew list --formula | {
+    while read -r formula; do
+      local deps_count=$(brew uses --installed $formula | wc -l)
+      printf '%30s is used by %2d formulae.\n' $formula $deps_count
+    done
+  }
+  # for formula in $(brew list --formula); do
+  #   local deps_count=$(brew uses --installed $formula | wc -l)
+  #   printf '%30s is used by %2d formulae.\n' $formula $deps_count
+  # done
+}
+
+# ====================
+# all pip update
+# ====================
+# pip_all_update() {
+#   echo "$(tput bold)Updating pip ...$(tput sgr0)"
+#   # fd --glob pip3 ${PYENV_ROOT}/versions --exec {} install -U pip
+#   # pip3 install -U pip
+#   for ver in $(pyenv versions --bare) system; do
+#     env PYENV_VERSION=${ver} pip3 install -U pip
+#   done
+# }
+
+# ====================
+# manpage
+# ====================
+# alias man="env LANG=C command man"
+# alias cman="env LANG=C man -C ${XDG_CONFIG_HOME}/man/man.conf"
+# alias jman="env LANG=ja_JP.UTF-8 man -C ${XDG_CONFIG_HOME}/man/man.conf"
+alias man="env LANG=C man"
+alias cman="env LANG=C command man"
+alias jman="env LANG=ja_JP.UTF-8 command man"
+
+# ==============================
+# tldr-c-client color customize
+# ==============================
+__tldr-customize() {
+  command tldr "$@" |
+    sed -e 's/\[34m/\[00m/g' \
+        -e 's/\[31m/\[38;5;204m/g' \
+        -e 's/\[32m/\[92m/g'
+}
+
+function tldr_platform_fallback() {
+  case $(uname -s) in
+    Linux)
+      env LANG=en_US.UTF-8 command tldr "$@"
+      ;;
+    *)
+      env LANG=en_US.UTF-8 command tldr "$@" 2>/dev/null
+      if [ $? -ne 0 ]; then
+        warn "Page for macOS not found. Search page for Linux." >&2
+        env LANG=en_US.UTF-8 command tldr --platform linux "$@"
+      fi
+      ;;
+  esac
+}
+
+# ====================
+# count timer
+# ====================
+function countup() {
+  local seconds=${1:-10}
+  printf "$(tput civis)"
+  local -i i
+  for i in $(seq $seconds); do
+    est=$(($i - 1))
+    printf " %3s / %s %${#seconds}s\r" $est $seconds " "
+    sleep 1
+  done
+  printf " %3s / %s %${#seconds}s\r" $i $seconds " "
+  # printf "\r%$(tput cols)s" " " # 消す必要性を考える
+  printf "$(tput cvvis)\n"
+}
+
+function countdown() {
+  local seconds=${1:-10}
+  local i
+  printf "$(tput civis)"
+  for i in $(seq $seconds -1 1); do
+    printf " %3s %${#seconds}s\r" $i " "
+    sleep 1
+  done
+  printf " %3s %${#seconds}s\r" 0 " "
+  # printf "\r%$(tput cols)s" " "
+  printf "$(tput cvvis)\n"
+}
+
+# ====================
+# Wether
+# ====================
+function wttr() {
+    # change Paris to your default location
+    local request="wttr.in/${1-Yokohama}"
+    [ "$(tput cols)" -lt 125 ] && request+='?n'
+    curl -H "Accept-Language: ${LANG%_*}" --compressed "$request"
+}
+
+# builtin-commandsのmanを参照
+function mansh() {
+  local cmd_name=$1
+  local shell_name=$(ps -o command= -p $$ | cut -d' ' -f 1)
+  case $shell_name in
+    *zsh)  command man zshbuiltins | less --pattern "^\s{,8}${cmd_name}\b" ;;
+    *bash) command man bash        | less --pattern "^\s{,8}${cmd_name}\b" ;;
+    *)     command man dash        | less --pattern "^\s{,8}${cmd_name}\b" ;;
+  esac
+}
+
+#====================
+# completion
+#====================
+# FIXME: pipは処理に問題があるらしくエラーメッセージが表示される
+#    一時的に無効化する
+#    https://github.com/pypa/pip/issues/12166
+# available pip3  && eval "$(pip3 completion --zsh)"
+
+# NOTE: poetry,pipenvはHomebrew側で設置するため、コメントアウト
+# which poetry > /dev/null && eval "$(poetry completion zsh)"
+# which pipenv > /dev/null && eval "$(pipenv --completion)"
+
+# available stern && source <(stern --completion=zsh)
+available pipx    && eval "$(register-python-argcomplete pipx)"
+available uv      && eval "$(uv generate-shell-completion zsh)"
+available fnm     && eval "$(fnm completions --shell zsh)"
+available volta   && eval "$(volta completions zsh)"
+available pnpm    && eval "$(pnpm completion zsh)"
+available wezterm && eval "$(wezterm shell-completion --shell zsh)"
+
+# ====================
+# peco
+# ====================
+# ----------------------------------------
+# pecoでhistory検索
+# peco-select-history() {
+#   BUFFER=$(builtin history -n -r 1 | peco --query "$LBUFFER")
+#   CURSOR=$#BUFFER
+#   zle clear-screen
+# }
+# zle -N peco-select-history
+# bindkey '^r' peco-select-history
+
+# ----------------------------------------
+# fzfとzでよく行くディレクトリに移動
+### source_if /usr/local/etc/profile.d/z.sh 2>/dev/null
+### source_if ${XDG_DATA_HOME}/z/z.sh       2>/dev/null
+
+### precmd_z() {
+###   _z --add "$(pwd -P)"
+### }
+### precmd_functions+=precmd_z
+
+# peco-z-search() {
+#   which peco z > /dev/null
+#   if [ $? -ne 0 ]; then
+#     echo "Please install peco and z"
+#     return false
+#   fi
+#   local dir=$(z | sort -rn | cut -c 12- | peco)
+#   if [ -n "${dir}" ]; then
+#     BUFFER="cd '${dir}'"
+#     zle accept-line
+#   else
+#     return false
+#   fi
+# }
+# zle -N peco-z-search
+# bindkey '^f' peco-z-search
+
+### fzf-z-search() {
+###  if non_available fzf z; then
+###    echo "Please install fzf and z"
+###    return false
+###  fi
+###  local dir=$(z | sort -rn | cut -c 12- | fzf |
+###                xargs -I _ command printf %q _)
+###                # perl -p -e 's/(?<!\\) /\\ /g')
+###  if [ -n "${dir}" ]; then
+###    BUFFER="cd ${dir}"
+###    zle accept-line
+###  else
+###    return false
+###  fi
+###}
+### zle -N fzf-z-search
+### bindkey '^F' fzf-z-search
+
+# fzf-edit-file() {
+#   local file
+#   file="$(fasd -Rfl "$1" | fzf -1 -0 --no-sort +m)"
+#   if [ -n "${file}" ]; then
+#     BUFFER="vim ${file}"
+#     zle accept-line
+#   else
+#     return false
+#   fi
+# }
+# zle -N fzf-edit-file
+# bindkey '^j' fzf-edit-file
+
+# v() {
+#   local file
+#   file="$(fasd -Rfl "$1" | fzf -1 -0 --no-sort +m)"
+#   if [ -n "${file}" ]; then
+#     vim "${file}"
+#   else
+#     return false
+#   fi
+# }
+
+# TODO: ファイル自体は有るが、viminfoに登録されていない場合どうするか
+# rupa/vを使用するためコメントアウト
+# v() {
+#   local file
+#   file=$(
+#     grep '^>' ~/.viminfo | cut -c3- |
+#       while read line; do
+#         local filename="${line/\~/$HOME}"
+#         [ -f "$filename" ] && echo "$filename"
+#       done |
+#       fzf --height=50% --no-multi --query="$*" -1 -0)
+
+#   [ -z "${file}" ] && return
+
+#   vim "${file}"
+# }
+
+vssh() {
+  local vm=$(
+    cat ~/.local/share/vagrant/data/machine-index/index |
+      jq -r '.machines[]
+        | [.name, .vagrantfile_path, .state]
+        | @tsv' |
+      column -t |
+      fzf)
+  local vagrant_name=$(echo $vm | awk '{print $1}')
+  local vagrant_path=$(echo $vm | awk '{print $2}')
+  local vagrant_state=$(echo $vm | awk '{print $3}')
+
+  if [ -z "${vagrant_path}" ]; then
+    # user interruppted
+    return 130
+  fi
+
+  cd "${vagrant_path}"
+  important "working directory: ${vagrant_path}"
+
+  case "${vagrant_state}" in
+    saved|poweroff)
+      important "main system activating virtual mode."
+      vagrant up
+      important "connecting..."
+      vagrant ssh
+      ;;
+    running)
+      important "connecting..."
+      vagrant ssh
+      ;;
+    *)
+      echo "${vagrant_name} is not available. (status: ${vagrant_state})" 1>&2
+      return 1
+      ;;
+  esac
+}
+
+# ====================
+# plugins
+# ====================
+
+# # 複数のfunctionがwidget登録できないためメモ化してラップ関数化する
+# #   参考:powerline
+# function __add_widget() {
+#   local widget="$1"
+#   local handler="$2"
+#   local old_widget_command="$(zle -l -L $widget)"
+#   if [[ "$old_widget_command" = "zle -N $widget $handler" ]] ; then
+#     return 0
+#   elif [[ -z "$old_widget_command" ]] ; then
+#     zle -N $widget $handler
+#   else
+#     local save_widget="_save_$widget"
+#     local -i i=0
+#     while ! test -z "$(zle -l -L $save_widget)" ; do
+#       save_widget="${save_widget}_$i"
+#       (( i++ ))
+#     done
+#     # If widget was defined with `zle -N widget` (without `function`
+#     # argument) then this function will be handy.
+#     eval "function $save_widget() { emulate -L zsh; $widget \$@ }"
+#     eval "${old_widget_command/$widget/$save_widget}"
+#     zle -N $widget $handler
+#     typeset -g __SAVE_WIDGET="$save_widget"
+#   fi
+# }
+
+function __set_cursor {
+  case "$1" in
+    vicmd)
+      # the command mode for vi
+      print -n "\e[2 q" ;;
+    *)
+      # the insert mode for vi
+      print -n "\e[6 q" ;;
+  esac
+}
+
+# function __zle-keymap-select {
+#   __set_cursor "$KEYMAP"
+#   test -z "$__SAVE_WIDGET" || zle $__SAVE_WIDGET
+# }
+
+function zle-keymap-select zle-line-init zle-line-finish {
+  __set_cursor "$KEYMAP"
+}
+
+zle -N zle-line-init
+zle -N zle-line-finish
+zle -N zle-keymap-select
+# __add_widget zle-keymap-select __zle-keymap-select
+
+# prompt: Starship
+available starship && eval "$(starship init zsh)"
+
+# direnv
+available direnv   && eval "$(direnv hook zsh)"
+
+# zoxide
+available zoxide   && eval "$(zoxide init zsh)"
+function zwidget::zoxide_fuzzy_cd () {
+  # zoxideのデフォルトのままだとEnter待ちとなるためzleを使用する
+  # キャンセルした場合はプロンプトが消えてしまうためzleで再描画する
+  local dir=$(zoxide query --interactive -- "$@")
+  if [ -n "${dir}" ]; then
+    zle redisplay
+    BUFFER="cd ${dir}"
+    zle accept-line
+  else
+    zle redisplay
+  fi
+  # __zoxide_zi && zle accept-line || zle redisplay
+}
+zle -N       zwidget::zoxide_fuzzy_cd
+bindkey '^F' zwidget::zoxide_fuzzy_cd
+
+# fasd
+# available fasd     && eval "$(fasd --init auto)"
+
+# ----------------------------------------
+# zsh-syntax-highlighting
+# if [ -d /usr/local/share/zsh-syntax-highlighting ]; then
+  # command-line colorize
+  # source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+  # ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=none
+# fi
+
+# zsh-fast-syntax-highlighting
+source_if ${BREW_PREFIX}/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+
+# zsh-f-sy-h
+# source_if ${BREW_PREFIX}/share/zsh-f-sy-h/F-Sy-H.plugin.zsh
+
+# ==============================
+#  clear screen without erase
+# ==============================
+function zle::term-utils::get-cursor-pos() {
+  local pos="" char
+  # ESC [ 6n : カーソルポジションが返される
+  #    -> \e[rows;colsR
+  print -n $'\e[6n'
+
+  while read -r -s -k1 char; do
+    [[ $char == R ]] && break
+    pos+=$char
+  done
+  pos=${pos#*\[}
+
+  REPLY_cursor_row_in_term=${pos%;*}
+  REPLY_cursor_col_in_term=${pos#*;}
+}
+
+function zle::utils::get-cursor-row-in-buffer() {
+  local -i cursor_row0_in_buffer=0
+  for (( i = 1; i < $#LBUFFER; i++ )); do
+    [[ ${LBUFFER[$i]} == $'\n' ]] && (( cursor_row0_in_buffer += 1 ))
+  done
+  REPLY_cursor_row0_in_buffer=$cursor_row0_in_buffer
+}
+
+function zle::term-utils::hide-scrollback-by() {
+  local by_rows="${1:-1}"
+  [[ "$by_rows" == 0 ]] && return
+
+  # SU:  数値分スクロールアップする
+  echo -n $'\e['"${by_rows}S" > /dev/tty
+  # CUU: カーソルを数値分上げる
+  echo -n $'\e['"${by_rows}A" > /dev/tty
+}
+
+function clear-but-keep-scrollback() {
+  local -i REPLY_cursor_row_in_term REPLY_cursor_col_in_term
+  zle::term-utils::get-cursor-pos
+
+  local -i REPLY_cursor_row0_in_buffer
+  zle::utils::get-cursor-row-in-buffer
+
+  local -i prompt_row=$(( REPLY_cursor_row_in_term - REPLY_cursor_row0_in_buffer ))
+  if [[ -n "$WIDGET" ]]; then
+    local -i prompt_lines=$( print -P "$PS1" | wc -l )
+    zle::term-utils::hide-scrollback-by "$(( prompt_row - prompt_lines ))"
+  else
+    zle::term-utils::hide-scrollback-by "$prompt_row"
+  fi
+
+  if [[ "$WIDGET" == "clear-but-keep-scrollback" ]]; then
+    zle redisplay
+  fi
+}
+zle -N clear-but-keep-scrollback
+
+case ${(L)TERM_PROGRAM} in
+  wezterm|iterm.app)
+    bindkey '^L' clear-but-keep-scrollback ;;
+  *)
+    bindkey '^L' clear-screen ;;
+esac
+# ==============================
+
+
+# ====================
+# insert empty line
+# ====================
+function zsh::term-utils::is_corsor_top_line() {
+  local cursor_row cursor_col
+  echo -n $'\e[6n'
+  IFS='[;' read -d R -s _ cursor_row cursor_col
+
+  [[ $cursor_row == "1" ]]
+  return $?
+}
+
+_INSERT_EMPTY_LINE_SKIP_CMDS=(
+  clear
+  clear-but-keep-scrollback
+  reset
+)
+function zsh::hook-funcs::insert_empty_line() {
+  # ログイン直後は何もしない
+  if [[ -z "$_INSERT_EMPTY_LINE" ]]; then
+    _INSERT_EMPTY_LINE='yes'
+    return
+  fi
+
+  # スキップ対象のコマンドの場合は何もしない
+  if (( ${_INSERT_EMPTY_LINE_SKIP_CMDS[(Ie)$_LAST_CMD]} )) ; then
+    return
+  fi
+
+  print
+}
+
+preexec() {
+  _LAST_CMD="$1"
+}
+
+add-zsh-hook precmd zsh::hook-funcs::insert_empty_line
+
+
+# ====================
+# fzf
+# ====================
+# available fzf && source_if "${XDG_CONFIG_HOME}/fzf/fzf.zsh"
+_fzf_compgen_path() {
+  fd --follow --strip-cwd-prefix "$1"
+}
+_fzf_compgen_dir() {
+  fd --type directory --hidden --follow . "$1"
+}
+if available fzf; then
+  source_if ${BREW_PREFIX}/opt/fzf/shell/key-bindings.zsh
+  source_if ${BREW_PREFIX}/opt/fzf/shell/completion.zsh
+  # カレント以下のファイルを選択
+  # bindkey -r '^T'
+  # bindkey '^Q' fzf-file-widget
+
+  # カレント以下のディレクトリへ移動
+  bindkey '^J' fzf-cd-widget
+fi
+
+# ====================
+# env snapshot
+# ====================
+function create-env-snapshot() {
+  remove-env-snapshot
+  ENV_SNAPSHOT=$(mktemp ${XDG_CACHE_HOME}/temp/env_snapshot.XXXXXXXXXX)
+  typeset -x > $ENV_SNAPSHOT
+  echo 'env snapshot created.'
+}
+
+function refresh2() {
+  for var in ${(k)parameters[(R)*export*]}; do
+    if [[ "$var" == "ENV_SNAPSHOT" ]]; then
+      continue
+    fi
+    unset var
+  done
+  unfunction $(functions)
+  source_if $ENV_SNAPSHOT
+
+  source_if ${ZDOT_DIR:-$HOME}/.zshenv
+  source_if ${ZDOT_DIR:-$HOME}/.zprofile
+  source_if ${ZDOT_DIR:-$HOME}/.zshrc
+}
+
+function remove-env-snapshot() {
+  if [[ ! -f "$ENV_SNAPSHOT" ]]; then
+    return
+  fi
+  rm $ENV_SNAPSHOT
+  echo 'env snapshot is removed.'
+}
+
+trap remove-env-snapshot EXIT
+
+
+# ====================
+# コンパイルして高速化
+for f in $HOME/{.zshrc,.zshenv,.zprofile}; do
+  # NOTE: バックアップから復元した場合は正しく動かなくなるので注意
+  if [ ! -e $f.zwc -o $f -nt $f.zwc ]; then
+    zcompile $f
+  fi
+done
+
+# ====================
+# プロファイリング用
+if which zprof > /dev/null 2>&1 ;then
+  zprof
+fi
+

@@ -1,0 +1,424 @@
+# set -o vi
+
+# ====================
+# コマンド確認
+# ====================
+available() {
+  type "$1" > /dev/null 2>&1
+}
+
+# aliases
+if available eza; then
+  alias eza='\eza --time-style=iso'
+  alias ls='eza'
+  alias ll='eza -hlgF'
+  alias la='eza -a'
+  alias lla='eza -hlgaF'
+  ## Show hidden files ##
+  alias l.='eza -d .*'
+else
+  case "${OSTYPE}" in
+    freebsd*|darwin*)
+      alias ls='ls -G'
+      alias ll='ls -lFg -G'
+      alias la='ls -a -G'
+      alias lla='ls -lFga -G'
+      ## Show hidden files ##
+      alias l.='ls -d -G .*'
+      ;;
+    linux*)
+      alias ls='ls --color'
+      alias ll='ls -lFg --color'
+      alias la='ls -a --color'
+      alias lla='ls -lFga --color'
+      ## Show hidden files ##
+      alias l.='ls -d --color .*'
+      ;;
+  esac
+fi
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias tmux='direnv exec / tmux'
+# alias cat='bat'
+# alias vscode='code'
+alias cd..='cd ..'
+alias ..='cd ..'
+alias ..2='cd ../..'
+alias ..3='cd ../../..'
+alias ..4='cd ../../../..'
+alias now='date +"%T"'
+alias today='date +"%Y-%m-%d"'
+alias whatis='env PAGER=cat whatis'
+alias apropos='env PAGER=cat apropos'
+available tree     && alias tree='tree --gitignore'
+# available tree     && alias tree='tree -NC'
+# available fd tree  && alias tree='roughtree'
+available irb      && alias irb="irb --readline --prompt-mode simple"
+available ptpython && alias ptpython="ptpython --config-file $XDG_CONFIG_HOME/ptpython/config.py"
+available ptpython && alias ppy='ptpython'
+available jq       && alias jq='jq -C'
+available pyenv    && alias brew="env PATH=${PATH//$(pyenv root)\/shims:/} brew" # `brew doctor`の警告回避
+available tldr     && alias tldr='tldr --language en'
+available fortune  && alias fortune="fortune ${HOME}/.local/share/fortune | sed 's/　/  /g'"
+available gh       && alias github='gh repo view --web'
+available ip       && alias ip='ip --color=auto'
+
+alias pip='_pip(){
+  if [ $1 = "search" ]; then
+    pip_search --date_format %Y-%m-%d "$2";
+  else
+    pip "$@";
+  fi;
+};_pip'
+
+if [[ -t 0 ]]; then
+  stty stop   undef
+  stty start  undef
+  stty werase undef
+fi
+
+# ====================
+# manpage colorize
+# ====================
+__man() {
+  LESS_TERMCAP_md=$'\e[01;34m' \
+  LESS_TERMCAP_me=$'\e[0m' \
+  LESS_TERMCAP_se=$'\e[0m' \
+  LESS_TERMCAP_so=$'\e[01;40;31m' \
+  LESS_TERMCAP_ue=$'\e[0m' \
+  LESS_TERMCAP_us=$'\e[01;32m' \
+  command man "$@"
+}
+
+
+__main() {
+  local os_type="$(uname)"
+  case "$os_type" in
+    Darwin)                    OS_ICON=" " ;;
+    SunOS)                     OS_ICON=" " ;;
+    CYGWIN_NT-* | MSYS_NT-*)   OS_ICON=" " ;;
+    FreeBSD|DragonFly)         OS_ICON=" " ;;
+    OpenBSD)                   OS_ICON=" " ;;
+    Linux)
+      local os_release_id="$(grep '^ID=' /etc/os-release | cut -d'=' -f2)"
+      case $os_release_id in
+        *arch*)                OS_ICON=" " ;;
+        *manjaro*)             OS_ICON=" " ;;
+        *endeavouros*)         OS_ICON=" " ;;
+
+        *debian*)              OS_ICON=" " ;;
+        *ubuntu*)              OS_ICON=" " ;;
+        *mint*)                OS_ICON=" " ;;
+        *devuan*)              OS_ICON=" " ;;
+        *deepin*)              OS_ICON=" " ;;
+        *raspbian*)            OS_ICON=" " ;;
+        *elementary*)          OS_ICON=" " ;;
+        *zorin*)               OS_ICON=" " ;;
+        *pop*)                 OS_ICON=" " ;;
+        *kali*)                OS_ICON=" " ;;
+
+        *redhat*)              OS_ICON=" " ;;
+        *fedora*)              OS_ICON=" " ;;
+        *centos*)              OS_ICON=" " ;;
+        *alma*)                OS_ICON=" " ;;
+        *rocky*)               OS_ICON=" " ;;
+
+        *alpine*)              OS_ICON=" " ;;
+        *coreos*)              OS_ICON=" " ;;
+        *gentoo*)              OS_ICON=" " ;;
+        *mandriva*)            OS_ICON=" " ;;
+        *mageia*)              OS_ICON=" " ;;
+        *opensuse*)            OS_ICON=" " ;;
+        *tumbleweed*)          OS_ICON=" " ;;
+        *sabayon*)             OS_ICON=" " ;;
+        *slackware*)           OS_ICON=" " ;;
+        *aosc*)                OS_ICON=" " ;;
+        *nixos*)               OS_ICON=" " ;;
+        *solus*)               OS_ICON=" " ;;
+        *)                     OS_ICON=" " ;;
+      esac
+      ;;
+    *) OS_ICON=""
+  esac
+}
+__main
+unset -f __main
+export OS_ICON
+
+
+
+source_if() {
+  local file_path=$1
+  if [ ! -f "${file_path}" ]; then
+    failure "${file_path}: no such file or directory"
+    false
+    return
+  fi
+  source ${file_path} #|| failure "${file_path}: error occured ($?)"
+}
+
+# ====================
+# mkdir and cd
+# ====================
+mkd() {
+  mkdir -p $@ && cd $_
+}
+
+# ====================
+# create empty file
+# ====================
+mkfile() {
+  if [ $# -lt 1 ]; then
+    echo "file path is required." 1>&2
+    return 1
+  fi
+  for file_path in "$@"; do
+    if [ -e "${file_path}" ]; then
+      echo "${file_path}: already exists." 1>&2
+      continue
+    fi
+    if [[ ${file_path} = */ ]]; then
+        # 最後が"/"のパスが指定された場合は空のディレクトリを作成する
+        mkdir -p ${file_path}
+        continue
+    fi
+    local parent_dir=$(dirname ${file_path})
+    mkdir -p ${parent_dir}
+    : > ${file_path}
+  done
+}
+
+failure() {
+  echo "$*" 1>&2
+  return 1
+}
+
+success() {
+  echo "$*"
+  return 0
+}
+
+# ====================
+# break a line
+# ====================
+br() {
+  tr "${1-[[:space:]]}" '\n'
+}
+
+# ====================
+# $PATH HumanReadable
+# ====================
+path() {
+  printenv PATH | tr ':' '\n'
+}
+
+searchenv() {
+  printenv | sort --field-separator='=' --key=1 | ag "${1}(?=.*=)"
+}
+
+refresh() {
+  # if [[ "$1" = '-f' ]]; then
+  #   rm -f ${HOME}/.zcompdump
+  # fi
+  exec ${SHELL} -l
+}
+
+# ====================
+# manpage
+# ====================
+alias man="env LANG=C man"
+alias cman="env LANG=C man -C ${XDG_CONFIG_HOME}/man/man.conf"
+alias jman="env LANG=ja_JP.UTF-8 man -C ${XDG_CONFIG_HOME}/man/man.conf"
+
+# ====================
+# tldr color customize
+# ====================
+__tldr-customize() {
+  command tldr $@ |
+    sed -e 's/\[34m/\[00m/g' \
+        -e 's/\[31m/\[38;5;204m/g' \
+        -e 's/\[32m/\[92m/g'
+}
+
+# ====================
+# count timer
+# ====================
+countup() {
+  local seconds=${1:-10}
+  for i in $(seq $seconds); do
+    sleep 1
+    printf " %3s / %s %${#seconds}s\r" $i $seconds " "
+  done
+}
+
+countdown() {
+  local seconds=${1:-10}
+  local i
+  for i in $(seq $seconds -1 1); do
+    printf " %3s %${#seconds}s\r" $i " "
+    sleep 1
+  done
+  printf "%$(tput cols)s\r" " "
+}
+
+# ====================
+# Wether
+# ====================
+wttr() {
+    # change Paris to your default location
+    local request="wttr.in/${1-Yokohama}"
+    [ "$(tput cols)" -lt 125 ] && request+='?n'
+    curl -H "Accept-Language: ${LANG%_*}" --compressed "$request"
+}
+
+# ====================
+# tree git managed file
+# ====================
+roughtree() {
+  local target_dir="${1:-.}"
+  # fd . $target_dir | tree --fromfile
+  fd --print0 --hidden --full-path . $target_dir |
+    xargs -0 ls -Fd |
+    command tree --fromfile
+}
+
+# builtin-commandsのmanを参照
+mansh() {
+  local cmd_name=$1
+  local shell_name=$(ps -o command= -p $$)
+  case $shell_name in
+    *zsh)  man zshbuiltins | less -p "^\s{,8}$cmd_name\b" ;;
+    *bash) man bash        | less -p "^\s{,8}$cmd_name\b" ;;
+    *)     man dash        | less -p "^\s{,8}$cmd_name\b" ;;
+  esac
+}
+
+# prompt: Starship
+available starship && eval "$(starship init bash)"
+
+# fasd
+available fasd     && eval "$(fasd --init auto)"
+# unalias z
+# z() {
+#     [ $# -gt 0 ] && fasd_cd -d "$*" && return
+#     local dir
+#     dir="$(fasd -Rdl "$1" | fzf -1 -0 --no-sort +m)" && cd "${dir}" || return 1
+# }
+v() {
+  local file
+  file="$(fasd -Rfl "$1" | fzf -1 -0 --no-sort +m)" && vim "${file}" || return 1
+}
+
+# fzf
+# available fzf && source_if "${XDG_CONFIG_HOME}/fzf/fzf.bash"
+# fzf
+# available fzf && source_if "${XDG_CONFIG_HOME}/fzf/fzf.zsh"
+if available fzf; then
+  source_if /usr/local/opt/fzf/shell/key-bindings.bash
+  source_if /usr/local/opt/fzf/shell/completion.bash
+  # bind -r '^t'
+  # bind '^q' fzf-file-widget
+fi
+
+
+# if available z; then
+  case "${OSTYPE}" in
+    darwin*)
+      source /usr/local/etc/profile.d/z.sh 2>/dev/null
+      ;;
+    linux*)
+      # install from linuxbrew
+      source_if /home/linuxbrew/.linuxbrew/etc/profile.d/z.sh 2>/dev/null
+      # install from github
+      source_if ${XDG_DATA_HOME}/z/z.sh 2>/dev/null
+      ;;
+  esac
+# fi
+# peco-z-search() {
+#   type peco z > /dev/null
+#   if [ $? -ne 0 ]; then
+#     echo "Please install peco and z"
+#     return 1
+#   fi
+#   local dir=$(z | sort -rn | cut -c 12- | peco)
+#   if [ -n "${dir}" ]; then
+#     cd "${dir}"
+#     return
+#   else
+#     return 1
+#   fi
+# }
+# bind -x '"\C-f": peco-z-search'
+
+fzf-z-search() {
+  type fzf z > /dev/null
+  if [ $? -ne 0 ]; then
+    echo "Please install fzf and z"
+    return 1
+  fi
+  local dir=$(z | sort -rn | cut -c 12- | fzf)
+  if [ -n "${dir}" ]; then
+    cd "${dir}"
+    return
+  else
+    return 1
+  fi
+}
+bind -x '"\C-f": fzf-z-search'
+
+# unalias z
+# z() {
+j() {
+  if [[ -z "$*" ]]; then
+    cd "$(_z -l 2>&1 | fzf +s --tac | sed 's/^[0-9,.]* *//')"
+  else
+    _last_z_args="$@"
+    _z "$@"
+  fi
+}
+
+jj() {
+  cd "$(_z -l 2>&1 | sed 's/^[0-9,.]* *//' | fzf -q "$_last_z_args")"
+}
+
+# keybind
+## inputrcはログインシェルの場合に読み込まれないため、強制的に読み込ませる
+## 判定は環境変数の設定を確認して行う
+if [ -z "${INPUTRC}" ] ; then
+  bind -f "${XDG_CONFIG_HOME}/readline/inputrc"
+fi
+
+# Use bash-completion, if available
+case "${OSTYPE}" in
+  linux*)
+    [ -n "${PS1}" ] && source_if /usr/share/bash-completion/bash_completion
+    ;;
+  darwin*)
+    source_if "/usr/local/etc/profile.d/bash_completion.sh"
+    ;;
+  *)
+    ;;
+esac
+
+if available brew ; then
+  HOMEBREW_PREFIX="$(brew --prefix)"
+  if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
+    source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
+  else
+    for COMPLETION in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*; do
+      [[ -r "${COMPLETION}" ]] && source "${COMPLETION}"
+    done
+  fi
+fi
+
+source_if ~/.local/share/bash-completion/completions/cargo
+source_if ~/.local/share/bash-completion/completions/rustup
+
+# >>>> Vagrant command completion (start)
+if available vagrant; then
+  # source_if /opt/vagrant/embedded/gems/gems/vagrant-2.3.7/contrib/bash/completion.sh
+  source_if /opt/vagrant/embedded/gems/gems/vagrant-*/contrib/bash/completion.sh
+fi
+# <<<<  Vagrant command completion (end)
+

@@ -1,0 +1,338 @@
+# ===============================
+#   Starship Prompt Config  🚀
+# ===============================
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Disable the newline at the start of the prompt
+add_newline = false
+# Wait 20 milliseconds for starship to check files under the current directory.
+scan_timeout = 20
+format = """\
+  $username\
+  ${custom.host}\
+  $all\
+  $time\
+  $line_break\
+  $character\
+"""
+  # $fill\
+
+[character]
+success_symbol = "[❯](bold)"
+error_symbol = "[❯](bold red)"
+vicmd_symbol = "[❮](bold)"
+# bellow config fish only
+vimcmd_replace_one_symbol = "[❮](bold purple)"
+vimcmd_replace_symbol = "[❮](bold purple)"
+vimcmd_visual_symbol = "[❮](bold yellow)"
+
+[fill]
+symbol = " "
+
+[username]
+show_always = false
+style_user = "bold yellow"
+style_root = "bold red"
+
+[hostname]
+ssh_only = true
+style = "bold blue"
+ssh_symbol = "󰖟 "
+disabled = true
+
+[custom.host]
+command = 'echo "${OS_ICON}$(hostname -s)"'
+# command = 'echo "${OS_ICON}"'
+when = 'test -n "${SSH_CONNECTION}"'
+format = "[$output]($style) in "
+style = "bold blue"
+shell = ["/bin/bash", "--norc"]
+disabled = false
+
+[directory]
+style = "bold cyan"
+# format = "in [$path]($style)[$read_only]($read_only_style) "
+
+# ディレクトリ階層が一定以上になった場合に上位のディレクトリを短縮する
+truncation_length = 3
+# リポジトリより上位のディレクトリを短縮する
+truncate_to_repo = true
+# 短縮された時の文字数
+fish_style_pwd_dir_length = 1
+
+read_only = " "
+read_only_style = "yellow"
+# i_fa.sh:41:i='' i_fa_lock=$i
+# i_fa.sh:165:i='' i_fa_unlock=$i
+# i_fa.sh:325:i='' i_fa_unlock_alt=$i
+
+
+[time]
+disabled = true
+use_12hr = false
+time_format = "%T"
+# style = "bold yellow"
+style = "bright-black"
+format = '[$time]($style) '
+
+[cmd_duration]
+disabled = true
+
+[shell]
+disabled = false
+style = "white"
+# デフォルトシェルと違うときだけ表示
+bash_indicator=" bash"
+fish_indicator=" fish"
+zsh_indicator=""
+#    i_cod_terminal
+#    i_dev_terminal
+#    i_oct_terminal
+
+
+[direnv]
+format = "[$symbol$loaded$allowed]($style) "
+disabled = false
+# エラーの時だけ表示
+loaded_msg = ""
+unloaded_msg = "not loaded"
+allowed_msg = ""
+not_allowed_msg = " not allowed"
+denied_msg = " denied"
+
+[git_commit]
+tag_symbol = " "
+tag_disabled = true
+only_detached = true
+
+[git_status]
+disabled = false
+
+[c]
+# symbol = " "
+symbol = " "
+
+[nodejs]
+# symbol = "⬢ "
+detect_extensions = ["js", "mjs", "cjs", "ts", "mts", "cts", "jsx", "tsx"]
+symbol = " "
+style = "bold green"
+
+[deno]
+symbol = " "
+
+[rust]
+symbol = " "
+style = "bold 172"
+# style = "bold 166"
+
+[golang]
+# symbol = " "
+symbol = " "
+style = "bold cyan"
+
+[python]
+symbol = " "
+pyenv_version_name = false
+style = "bold yellow"
+# detect_extensions = ["py", "ipynb"]
+detect_extensions = ["py"]
+
+[ruby]
+symbol = " "
+style = "bold 166"
+
+[java]
+#symbol = " "
+symbol = " "
+style = "bold 166"
+
+[kotlin]
+symbol = " "
+
+[gradle]
+symbol = " "
+
+[scala]
+symbol = " "
+
+[php]
+symbol = " "
+style = "bold 109"
+
+[perl]
+symbol = " "
+
+[dart]
+symbol = " "
+
+[elm]
+symbol = " "
+
+[elixir]
+symbol = " "
+# detect_extensions = ["exs"]
+
+[haskell]
+symbol = " "
+
+[julia]
+symbol = " "
+
+[nim]
+symbol = " "
+
+[rlang]
+symbol = " "
+
+[package]
+symbol = " "
+disabled = true
+
+[gcloud]
+disabled = true
+
+[vagrant]
+format = "via [$symbol]($style)"
+symbol = " "
+disabled = false
+
+[kubernetes]
+symbol = "󱃾 "
+
+[docker_context]
+# symbol = " " # seti
+symbol = " " # logo
+
+[cmake]
+symbol = " "
+
+[lua]
+symbol = " "
+
+# Devicons
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#           
+
+# Seti-UI Cusotom
+#           
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#                               
+#                         
+
+
+[os]
+# format = "[$symbol]($style)"
+# format = "on [($name )]($style)"
+format = "on [$symbol]($style)"
+disabled = true
+
+[os.symbols]
+#                               
+#                               
+#                               
+Alpine = " "
+AlmaLinux = " "
+Amazon = " "       # logoにない
+Android = " "      # logoにない
+Arch = " "
+Artix = " "
+CentOS = " "
+Debian = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = " "
+Gentoo = " "
+Illumos = " "
+Kali = " "
+Linux = " "
+Macos = " "
+Manjaro = " "
+Mint = " "
+NixOS = " "
+Nobara = " "
+OpenBSD = " "
+openSUSE = " "
+OracleLinux = "󰌷 " # logoにない
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+RockyLinux = " "
+Solus = " "
+SUSE = " "
+Ubuntu = " "
+Void = " "
+Windows = " "
+
+
+# preset [ner-dont-symbols]
+# [os.symbols]
+# Alpaquita = " "
+# Alpine = " "
+# AlmaLinux = " "
+# Amazon = " "
+# Android = " "
+# Arch = " "
+# Artix = " "
+# CachyOS = " "
+# CentOS = " "
+# Debian = " "
+# DragonFly = " "
+# Emscripten = " "
+# EndeavourOS = " "
+# Fedora = " "
+# FreeBSD = " "
+# Garuda = "󰛓 "
+# Gentoo = " "
+# HardenedBSD = "󰞌 "
+# Illumos = "󰈸 "
+# Kali = " "
+# Linux = " "
+# Mabox = " "
+# Macos = " "
+# Manjaro = " "
+# Mariner = " "
+# MidnightBSD = " "
+# Mint = " "
+# NetBSD = " "
+# NixOS = " "
+# Nobara = " "
+# OpenBSD = "󰈺 "
+# openSUSE = " "
+# OracleLinux = "󰌷 "
+# Pop = " "
+# Raspbian = " "
+# Redhat = " "
+# RedHatEnterprise = " "
+# RockyLinux = " "
+# Redox = "󰀘 "
+# Solus = "󰠳 "
+# SUSE = " "
+# Ubuntu = " "
+# Unknown = " "
+# Void = " "
+# Windows = "󰍲 "
+
+
